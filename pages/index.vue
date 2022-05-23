@@ -7,7 +7,9 @@
 
       <div class="dynamic-charts">
         <ChartWrapped class="my-3 ml-3" />
+
         <ChartWrapped class="my-3 ml-3" />
+
         <v-card class="my-3 ml-3">
           <div class="d-flex align-center justify-center pa-3">
             Add new chart
@@ -19,22 +21,6 @@
         </v-card>
       </div>
     </div>
-
-    <div>test</div>
-    <div>test</div>
-    <div>test</div>
-    <div>test</div>
-    <div>test</div>
-    <div>test</div>
-    <div>test</div>
-    <div>test</div>
-    <div>test</div>
-    <div>test</div>
-    <div>test</div>
-    <div>test</div>
-    <div>test</div>
-    <div>test</div>
-    <div>test</div>
   </v-container>
 </template>
 
@@ -42,16 +28,41 @@
 // import { watch } from "@nuxtjs/composition-api";
 import ChartWrapped from "@/components/ChartWrapped";
 import DashboardControls from "@/components/DashboardControls";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   components: { ChartWrapped, DashboardControls },
 
-  mounted() {
+  async mounted() {
+    await this.getSensorTypesList();
+    await this.getSensorsList();
+    await this.getDataList();
+
+    console.log(this.sensors);
+    console.log(this.sensorTypes);
+    console.log(this.data);
+
     // const handler = () => {
     //   const { sm, md, lg } = this.$vuetify.breakpoint;
     // };
     // // Throttle !
     // watch(this.$vuetify.breakpoint, handler, { immediate: true });
+  },
+
+  computed: {
+    ...mapGetters({
+      sensors: "sensors/list",
+      sensorTypes: "sensorTypes/list",
+      data: "data/list",
+    }),
+  },
+
+  methods: {
+    ...mapActions({
+      getSensorTypesList: "sensorTypes/getList",
+      getSensorsList: "sensors/getList",
+      getDataList: "data/getList",
+    }),
   },
 };
 </script>

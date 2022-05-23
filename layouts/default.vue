@@ -27,7 +27,7 @@
     </v-app-bar>
 
     <v-main>
-      <Nuxt />
+      <Nuxt keep-alive />
     </v-main>
 
     <!-- <v-footer :absolute="!fixed" app>

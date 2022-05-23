@@ -1,7 +1,6 @@
 <template>
-  <v-card class="controls-wrapper-card flex-grow-1 my-3">
+  <v-card class="flex-grow-1 my-3">
     <v-row class="ma-0">
-      <!-- class="ma-0 pa-0" -->
       <v-col ld="2" md="3" xs="12">
         <v-menu
           ref="menuref"
@@ -26,17 +25,27 @@
         </v-menu>
       </v-col>
 
-      <!-- class="ma-0 pa-0" -->
       <v-col ld="2" md="3" xs="12">
-        <v-autocomplete solo outlined multiple label="Sensors filter" />
+        <v-autocomplete
+          :items="preparedSensorTypesList"
+          solo
+          outlined
+          multiple
+          label="Sensors types"
+        />
       </v-col>
 
-      <!-- class="ma-0 pa-0" -->
-      <v-col ld="2" md="3" xs="12">
-        <v-autocomplete solo outlined multiple label="Sensors types" />
+      <v-col ld="12" md="12" xs="12">
+        <v-autocomplete
+          :items="preparedSensorsList"
+          solo
+          outlined
+          multiple
+          label="Sensors filter"
+        />
       </v-col>
 
-      <v-col ld="2" md="3" xs="12" class="d-flex">
+      <v-col ld="12" md="12" xs="12" class="d-flex">
         <v-btn class="flex-grow-1" depressed color="primary"> Refresh </v-btn>
       </v-col>
     </v-row>
@@ -44,7 +53,17 @@
 </template>
 
 <script setup>
-import { ref } from "@nuxtjs/composition-api";
+import { ref, computed, useStore } from "@nuxtjs/composition-api";
+
+const store = useStore();
+
+const sensors = computed(() => store.getters["sensors/list"]);
+const sensorTypes = computed(() => store.getters["sensorTypes/list"]);
+
+const preparedSensorsList = computed(() => sensors.value.map((s) => s.mac));
+const preparedSensorTypesList = computed(() =>
+  sensorTypes.value.map((s) => s.name)
+);
 
 const menu = ref(false);
 const date = ref(null);
@@ -55,8 +74,4 @@ const date = ref(null);
 
 
 <style scoped>
-.controls-wrapper-card {
-  /* margin: 24px; */
-  /* margin-bottom: 0; */
-}
 </style>

@@ -76,7 +76,6 @@ const onSettingsIconHover = ({ srcElement }) => {
 
       &.visible {
         visibility: visible;
-        // background: white;
       }
     }
   }
