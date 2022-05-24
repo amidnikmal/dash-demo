@@ -1,9 +1,6 @@
 const FAKE_DATA_COUNT = 20;
 
 export function initData (config) {
-  // console.log('init data', config)
-  // return (new Array(20)).map(() => ({ x: Math.random(), y: Math.random() }))
-
   const output = []
   for (let i=0; i<FAKE_DATA_COUNT; i++) {
     output.push({
@@ -32,7 +29,6 @@ export function addSeriesToChart(chart, config) {
       ...config,
       yAxis: chart.yAxis.length - 1,
       type: "spline",
-      // showInNavigator: true,
     },
     true
   );

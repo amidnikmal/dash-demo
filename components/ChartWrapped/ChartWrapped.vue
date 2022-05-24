@@ -37,10 +37,25 @@
 import Controls from "./Controls.vue";
 import Settings from "./Settings.vue";
 
-import { ref, onMounted } from "@nuxtjs/composition-api";
+import {
+  ref,
+  computed,
+  onMounted,
+  useStore,
+  watch,
+  nextTick,
+} from "@nuxtjs/composition-api";
 
 import { getConfig } from "./config.js";
 import { initData, addSeriesToChart } from "./chart.js";
+
+const store = useStore();
+
+// const sensors = computed(() => store.getters["sensors/list"]);
+// const sensorTypes = computed(() => store.getters["sensorTypes/list"]);
+
+const dataAgg = computed(() => store.getters["data/agg"]);
+const visibleSensors = computed(() => store.getters["data/visibleSensors"]);
 
 const loading = ref(false);
 
@@ -50,11 +65,19 @@ const config = getConfig();
 onMounted(() => {
   const chartref = chart.value.chart;
 
-  const s = addSeriesToChart(chartref);
+  watch(
+    visibleSensors,
+    () => {
+      for (const key in visibleSensors.value) {
+        const s = addSeriesToChart(chartref, { name: key });
+        s.setData(visibleSensors.value[key].data);
+      }
+    },
+    { immediate: true }
+  );
 
-  const data = initData(config);
-
-  s.setData(data);
+  // const data = initData(config);
+  // s.setData(data);
 });
 
 const onSettingsIconHover = ({ srcElement }) => {

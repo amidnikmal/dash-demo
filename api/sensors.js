@@ -1,6 +1,6 @@
 import { getRandomMac, getRandomNumberBetween } from './helpers'
-
-const FAKE_SENSROS_COUNT = 10
+import { SENSOR_TYPES } from './sensorTypes'
+const FAKE_SENSROS_COUNT = 2
 const FAKE_DELAY_MS = 500
 
 const generateFakeSensors = () => {
@@ -9,7 +9,7 @@ const generateFakeSensors = () => {
     output.push({
       id: i,
       mac: getRandomMac(),
-      type: getRandomNumberBetween(0, 2),
+      type: getRandomNumberBetween(0, SENSOR_TYPES.length-1),
       timestamp: new Date()
     })
   }

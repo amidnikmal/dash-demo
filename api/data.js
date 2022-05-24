@@ -5,7 +5,7 @@ import { fakeList as fakeSensorsList } from './sensors'
 import { SENSOR_TYPES } from './sensorTypes'
 
 const FAKE_DATA_ITEMS_COUNT = 3
-
+const FAKE_DATA_DATES_RANGE = { from: new Date('1/01/2022'), to: new Date() }
 
 const generators = {
   temp: () => {
@@ -44,10 +44,15 @@ const generateFakeData = () => {
     output.push({
       id: i,
       sensor_type: randSensor.type,
+      sensor_id: randSensor.id,
       payload,
-      timestamp: randBetweenDate({ from: new Date('10/07/2020'), to: new Date() })
+      timestamp: randBetweenDate(FAKE_DATA_DATES_RANGE)
     })
   }
+
+  output.sort((a,b) => {
+    return (+new Date(a.timestamp)) - (+new Date(b.timestamp))
+  })
 
   return output
 }
