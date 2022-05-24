@@ -1,8 +1,8 @@
 
-
+import { randBetweenDate } from '@ngneat/falso'
 import { getRandomNumberBetween } from './helpers'
 import { fakeList as fakeSensorsList } from './sensors'
-import {SENSOR_TYPES} from './sensorTypes'
+import { SENSOR_TYPES } from './sensorTypes'
 
 const FAKE_DATA_ITEMS_COUNT = 3
 
@@ -44,7 +44,8 @@ const generateFakeData = () => {
     output.push({
       id: i,
       sensor_type: randSensor.type,
-      payload
+      payload,
+      timestamp: randBetweenDate({ from: new Date('10/07/2020'), to: new Date() })
     })
   }
 

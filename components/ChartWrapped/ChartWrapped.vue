@@ -9,9 +9,20 @@
         @mouseleave="onSettingsIconHover"
       >
         <div class="settings-icon">
-          <v-btn class="mx-2" fab dark color="indigo">
-            <v-icon dark>mdi-cog-outline</v-icon>
-          </v-btn>
+          <Settings>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                class="mx-2"
+                fab
+                dark
+                color="indigo"
+                v-bind="attrs"
+                v-on="on"
+              >
+                <v-icon dark>mdi-cog-outline</v-icon>
+              </v-btn>
+            </template>
+          </Settings>
         </div>
       </div>
 
@@ -24,6 +35,7 @@
 <script setup>
 // Switching to bar chart ?
 import Controls from "./Controls.vue";
+import Settings from "./Settings.vue";
 
 import { ref, onMounted } from "@nuxtjs/composition-api";
 

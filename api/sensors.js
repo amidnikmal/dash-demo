@@ -9,7 +9,8 @@ const generateFakeSensors = () => {
     output.push({
       id: i,
       mac: getRandomMac(),
-      type: getRandomNumberBetween(0, 2)
+      type: getRandomNumberBetween(0, 2),
+      timestamp: new Date()
     })
   }
   return output
