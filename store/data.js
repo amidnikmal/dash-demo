@@ -1,10 +1,48 @@
 import { DataApi } from '@/api/data'
 import Vue from 'vue'
 
+
+
+const prepareSeries = (state, ctx) => {
+  console.log('prepare series')
+  const { sensorTypes, sensors } = ctx.rootState
+  let agg = {}
+  let index=0
+  for (const dataItem of state.list) {
+    const sensor = sensors.list.find(s => s.id == dataItem.sensor_id)
+    const sensorType = sensorTypes.list.find(t => t.id == sensor.type)
+
+    for (const sensorKind of sensorType.sensors) {
+      const point =  { x: +new Date(dataItem.timestamp), y: dataItem.payload[sensorKind] }
+
+      if (!agg[`${sensor.id}_${sensorKind}`]) {
+        Vue.set(agg, `${sensor.id}_${sensorKind}`, {
+          color: null,
+          visible: true,
+          sensor,
+          sensorType,
+          data: [ point ]
+        })
+        continue
+      }
+
+      agg[`${sensor.id}_${sensorKind}`].data.push(point)
+    }
+  }
+
+  for (const key in agg) {
+    agg[key].data.sort((a, b) => a.x - b.x)
+  }
+
+  return agg
+}
+
+
 export const state = () => ({
   filters: {},
   list: [],
-  agg: {}
+  agg: {},
+  charts: []
 })
 
 export const getters = {
@@ -16,52 +54,47 @@ export const getters = {
     const entries = Object.entries(state.agg)
     const filtered = entries.filter(([ _, { visible } ]) => visible)
 
-    // console.log("from entries", Object.fromEntries(filtered))
-
     return Object.fromEntries(filtered)
-  }
+  },
+
+  charts: state => state.charts
 }
 
 export const mutations = {
   setList(state, list) {
     state.list = list
-  },    
+  },
 
-  prepareSeries(state, ctx) {
-    const { sensorTypes, sensors } = ctx.rootState
+  prepareCharts(state, { ctx }) {
+    // console.log("prepareCharts", ctx.commit('prepareSeries', ctx))
+    // localStorage.getItem('key') ? JSON.parse(localStorage.getItem('key')) : '';
 
-    let index=0
-    for (const dataItem of state.list) {
-      const sensor = sensors.list.find(s => s.id == dataItem.sensor_id)
-      const sensorType = sensorTypes.list.find(t => t.id == sensor.type)
+    let charts = JSON.parse(localStorage.getItem('charts'))
 
-      for (const sensorKind of sensorType.sensors) {
-        const point =  { x: +new Date(dataItem.timestamp), y: dataItem.payload[sensorKind] }
+    if (!charts || charts.length == 0) {
+      const agg = prepareSeries(state, ctx)
 
-        if (!state.agg[`${sensor.id}_${sensorKind}`]) {
-          Vue.set(state.agg, `${sensor.id}_${sensorKind}`, {
-            visible: true,
-            sensor,
-            sensorType,
-            data: [ point ]
-          })
-
-          continue
-        }
-        state.agg[`${sensor.id}_${sensorKind}`].data.push(point)
-      }
+      state.charts = [{
+        agg,
+        activeSensors: Object.entries(agg).map(([key, value])=> key)
+      }]
+      return
     }
 
-    for (const key in state.agg) {
-      state.agg[key].data.sort((a, b) => a.x - b.x)
-    }
-  }
+    state.charts = charts
+
+  },
+
+
 }
 
 export const actions = {
   async getList(ctx) {
     const list = await DataApi.getList()
     ctx.commit('setList', list)
-    ctx.commit('prepareSeries', ctx)
+    // ctx.commit('prepareSeries', { ctx, chartIndex })
+    ctx.commit('prepareCharts', { ctx })
+
+    
   }
 }

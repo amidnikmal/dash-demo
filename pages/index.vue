@@ -6,9 +6,15 @@
       <v-card class="stats my-3"> stats </v-card>
 
       <div class="dynamic-charts">
-        <ChartWrapped class="my-3 ml-3" />
+        <!-- <ChartWrapped class="my-3 ml-3" />
+        <ChartWrapped class="my-3 ml-3" /> -->
 
-        <ChartWrapped class="my-3 ml-3" />
+        <ChartWrapped
+          class="my-3 ml-3"
+          :key="index"
+          v-for="(chart, index) in charts"
+          v-bind="{ index, chart }"
+        />
 
         <v-card class="my-3 ml-3">
           <div class="d-flex align-center justify-center pa-3">
@@ -54,6 +60,7 @@ export default {
       sensors: "sensors/list",
       sensorTypes: "sensorTypes/list",
       data: "data/list",
+      charts: "data/charts",
     }),
   },
 

@@ -26,7 +26,7 @@
         </div>
       </div>
 
-      <VueHighcharts class="data-chart" ref="chart" :options="config" />
+      <VueHighcharts class="data-chart" ref="chartref" :options="config" />
     </v-card>
   </div>
 </template>
@@ -44,40 +44,41 @@ import {
   useStore,
   watch,
   nextTick,
+  defineProps,
 } from "@nuxtjs/composition-api";
 
 import { getConfig } from "./config.js";
 import { initData, addSeriesToChart } from "./chart.js";
 
-const store = useStore();
+const props = defineProps({
+  chart: Object,
+  index: Number,
+});
 
+// console.log("PROPS", props);
+// const store = useStore();
 // const sensors = computed(() => store.getters["sensors/list"]);
 // const sensorTypes = computed(() => store.getters["sensorTypes/list"]);
-
-const dataAgg = computed(() => store.getters["data/agg"]);
-const visibleSensors = computed(() => store.getters["data/visibleSensors"]);
+// const dataAgg = computed(() => store.getters["data/agg"]);
+// const visibleSensors = computed(() => store.getters["data/visibleSensors"]);
 
 const loading = ref(false);
-
-const chart = ref(null);
+const chartref = ref(null);
 const config = getConfig();
 
 onMounted(() => {
-  const chartref = chart.value.chart;
+  const localchartref = chartref.value.chart;
 
   watch(
-    visibleSensors,
+    props.chart.agg,
     () => {
-      for (const key in visibleSensors.value) {
-        const s = addSeriesToChart(chartref, { name: key });
-        s.setData(visibleSensors.value[key].data);
+      for (const key in props.chart.agg) {
+        const s = addSeriesToChart(localchartref, { name: key });
+        s.setData(props.chart.agg[key].data);
       }
     },
     { immediate: true }
   );
-
-  // const data = initData(config);
-  // s.setData(data);
 });
 
 const onSettingsIconHover = ({ srcElement }) => {
