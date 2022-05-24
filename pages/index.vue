@@ -16,15 +16,7 @@
           v-bind="{ index, chart }"
         />
 
-        <v-card class="my-3 ml-3">
-          <div class="d-flex align-center justify-center pa-3">
-            Add new chart
-
-            <v-btn class="mx-2" fab dark color="indigo">
-              <v-icon dark>mdi-plus</v-icon>
-            </v-btn>
-          </div>
-        </v-card>
+        <AddNewChart />
       </div>
     </div>
   </v-container>
@@ -32,12 +24,15 @@
 
 <script>
 // import { watch } from "@nuxtjs/composition-api";
+
 import ChartWrapped from "@/components/ChartWrapped";
 import DashboardControls from "@/components/DashboardControls";
+import AddNewChart from "@/components/AddNewChart";
+
 import { mapGetters, mapActions } from "vuex";
 
 export default {
-  components: { ChartWrapped, DashboardControls },
+  components: { ChartWrapped, DashboardControls, AddNewChart },
 
   async mounted() {
     await this.getSensorTypesList();

@@ -2,13 +2,11 @@ import { DataApi } from '@/api/data'
 import Vue from 'vue'
 
 
-
-const prepareSeries = (state, ctx) => {
-  console.log('prepare series')
-  const { sensorTypes, sensors } = ctx.rootState
+const prepareSeries = (ctx) => {
+  const { sensorTypes, sensors, data } = ctx.rootState
   let agg = {}
   let index=0
-  for (const dataItem of state.list) {
+  for (const dataItem of data.list) {
     const sensor = sensors.list.find(s => s.id == dataItem.sensor_id)
     const sensorType = sensorTypes.list.find(t => t.id == sensor.type)
 
@@ -34,7 +32,16 @@ const prepareSeries = (state, ctx) => {
     agg[key].data.sort((a, b) => a.x - b.x)
   }
 
-  return agg
+  return JSON.parse(JSON.stringify(agg))
+}
+
+
+const initChart = (ctx) => {
+  const agg = prepareSeries(ctx)
+  return {
+    agg,
+    activeSensors: Object.entries(agg).map(([key, value])=> key)
+  }
 }
 
 
@@ -45,6 +52,7 @@ export const state = () => ({
   charts: []
 })
 
+
 export const getters = {
   list: state => state.list,
 
@@ -53,7 +61,6 @@ export const getters = {
   visibleSensors: state => {
     const entries = Object.entries(state.agg)
     const filtered = entries.filter(([ _, { visible } ]) => visible)
-
     return Object.fromEntries(filtered)
   },
 
@@ -66,35 +73,40 @@ export const mutations = {
   },
 
   prepareCharts(state, { ctx }) {
-    // console.log("prepareCharts", ctx.commit('prepareSeries', ctx))
-    // localStorage.getItem('key') ? JSON.parse(localStorage.getItem('key')) : '';
-
     let charts = JSON.parse(localStorage.getItem('charts'))
 
     if (!charts || charts.length == 0) {
-      const agg = prepareSeries(state, ctx)
-
-      state.charts = [{
-        agg,
-        activeSensors: Object.entries(agg).map(([key, value])=> key)
-      }]
+      state.charts = [ initChart(ctx) ]
       return
     }
 
     state.charts = charts
-
   },
 
+  addChart(state, { ctx , props }) {
+    state.charts.push(initChart(ctx))
 
+    localStorage.setItem('charts', JSON.stringify(state.charts))
+  },
+
+  removeChart(state, { ctx , index}) {
+    state.charts.splice(index, 1)
+    localStorage.setItem('charts', JSON.stringify(state.charts))
+  }
 }
 
 export const actions = {
   async getList(ctx) {
     const list = await DataApi.getList()
     ctx.commit('setList', list)
-    // ctx.commit('prepareSeries', { ctx, chartIndex })
     ctx.commit('prepareCharts', { ctx })
+  },
 
-    
+  addChart(ctx, props) {
+    ctx.commit('addChart', { ctx, props })
+  },
+
+  removeChart(ctx, index) {
+    ctx.commit('removeChart', {ctx, index})
   }
 }

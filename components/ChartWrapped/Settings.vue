@@ -31,6 +31,7 @@
 
       <v-card-actions>
         <v-spacer></v-spacer>
+        <v-btn color="error" text @click="onRemoveClick">Remove</v-btn>
         <v-btn text @click="onClickCancel">Cancel</v-btn>
         <v-btn color="primary" text @click="onClickUpdate">Update</v-btn>
       </v-card-actions>
@@ -40,27 +41,26 @@
 
 <script setup>
 import FiltersTab from "./FiltersTab.vue";
-import { ref, watch } from "@nuxtjs/composition-api";
+import {
+  ref,
+  watch,
+  getCurrentInstance,
+  useStore,
+} from "@nuxtjs/composition-api";
+
+const instance = getCurrentInstance();
+const store = useStore();
 
 const FILTERS_TAB = 0;
 const COLORS_TAB = 1;
 
-// const DATES_RANGE_TAB = 2;
-
 const dialog = ref(false);
 const tab = ref(null);
-
-// const tabs = ["Sensor types", "Sensors", "Dates range"];
 
 const tabs = {
   [FILTERS_TAB]: { name: "Filters", c: FiltersTab },
   [COLORS_TAB]: { name: "Colors" },
 };
-
-const text = "hello world";
-// watch(tab, () => {
-//   console.log("TAB", tab);
-// });
 
 const onClickCancel = () => {
   console.log("onClickCancel");
@@ -68,5 +68,10 @@ const onClickCancel = () => {
 
 const onClickUpdate = () => {
   console.log("onClickUpdate");
+};
+
+const onRemoveClick = () => {
+  const chartIndex = instance.parent.parent.props.index;
+  store.dispatch("data/removeChart", chartIndex);
 };
 </script>
