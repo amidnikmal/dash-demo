@@ -1,15 +1,15 @@
-const FAKE_DATA_COUNT = 20;
+// const FAKE_DATA_COUNT = 20;
 
-export function initData (config) {
-  const output = []
-  for (let i=0; i<FAKE_DATA_COUNT; i++) {
-    output.push({
-      x: Math.random(),
-      y: Math.random()
-    })
-  }
-  return output.sort((a,b) => a.x - b.x )
-}
+// export function initData (config) {
+//   const output = []
+//   for (let i=0; i<FAKE_DATA_COUNT; i++) {
+//     output.push({
+//       x: Math.random(),
+//       y: Math.random()
+//     })
+//   }
+//   return output.sort((a,b) => a.x - b.x )
+// }
 
 
 export function addSeriesToChart(chart, config) {

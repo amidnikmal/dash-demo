@@ -4,8 +4,8 @@ import Vue from 'vue'
 
 const prepareSeries = (ctx) => {
   const { sensorTypes, sensors, data } = ctx.rootState
+
   let agg = {}
-  let index=0
   for (const dataItem of data.list) {
     const sensor = sensors.list.find(s => s.id == dataItem.sensor_id)
     const sensorType = sensorTypes.list.find(t => t.id == sensor.type)
@@ -14,8 +14,10 @@ const prepareSeries = (ctx) => {
       const point =  { x: +new Date(dataItem.timestamp), y: dataItem.payload[sensorKind] }
 
       if (!agg[`${sensor.id}_${sensorKind}`]) {
+        const color = '#'+Math.floor(Math.random()*16777215).toString(16);
+
         Vue.set(agg, `${sensor.id}_${sensorKind}`, {
-          color: null,
+          color,
           visible: true,
           sensor,
           sensorType,
@@ -89,8 +91,17 @@ export const mutations = {
     localStorage.setItem('charts', JSON.stringify(state.charts))
   },
 
-  removeChart(state, { ctx , index}) {
+  removeChart(state, { index }) {
     state.charts.splice(index, 1)
+    localStorage.setItem('charts', JSON.stringify(state.charts))
+  },
+
+  changeChartParams(state, { ctx, params }) {
+    const { index, key: sensorKey, ...actualParams } = params
+    for (const key in actualParams) {
+      Vue.set(state.charts[index].agg[sensorKey], key, actualParams[key])
+    }
+
     localStorage.setItem('charts', JSON.stringify(state.charts))
   }
 }
@@ -107,6 +118,10 @@ export const actions = {
   },
 
   removeChart(ctx, index) {
-    ctx.commit('removeChart', {ctx, index})
+    ctx.commit('removeChart', { ctx, index })
+  },
+
+  changeChartParams(ctx, params) {
+    ctx.commit('changeChartParams', { ctx, params })
   }
 }

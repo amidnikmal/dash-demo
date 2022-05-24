@@ -6,9 +6,6 @@
       <v-card class="stats my-3"> stats </v-card>
 
       <div class="dynamic-charts">
-        <!-- <ChartWrapped class="my-3 ml-3" />
-        <ChartWrapped class="my-3 ml-3" /> -->
-
         <ChartWrapped
           class="my-3 ml-3"
           :key="index"

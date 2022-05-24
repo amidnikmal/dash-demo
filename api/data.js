@@ -4,7 +4,7 @@ import { getRandomNumberBetween } from './helpers'
 import { fakeList as fakeSensorsList } from './sensors'
 import { SENSOR_TYPES } from './sensorTypes'
 
-const FAKE_DATA_ITEMS_COUNT = 3
+const FAKE_DATA_ITEMS_COUNT = 25
 const FAKE_DATA_DATES_RANGE = { from: new Date('1/01/2022'), to: new Date() }
 
 const generators = {

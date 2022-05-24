@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <v-container>
     <v-menu
       ref="menuref"
       v-model="menu"
@@ -22,7 +22,7 @@
       <v-date-picker v-model="date" range />
     </v-menu>
 
-    <v-autocomplete
+    <!-- <v-autocomplete
       :items="preparedSensorTypesList"
       solo
       outlined
@@ -36,8 +36,8 @@
       outlined
       multiple
       label="Sensors filter"
-    />
-  </div>
+    /> -->
+  </v-container>
 </template>
 
 <script setup>
