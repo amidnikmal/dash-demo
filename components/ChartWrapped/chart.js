@@ -17,6 +17,7 @@ export function addSeriesToChart(chart, config) {
     margin: 100,
     title: { enabled: false },
     labels: {
+      // visible: false,
       enabled: false,
       formatter: function () {
         return this.value;
@@ -28,6 +29,7 @@ export function addSeriesToChart(chart, config) {
     {
       ...config,
       yAxis: chart.yAxis.length - 1,
+      // yAxis: 0,
       type: "spline",
     },
     true

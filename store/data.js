@@ -87,7 +87,6 @@ export const mutations = {
 
   addChart(state, { ctx , props }) {
     state.charts.push(initChart(ctx))
-
     localStorage.setItem('charts', JSON.stringify(state.charts))
   },
 

@@ -35,6 +35,7 @@ import { ref, onMounted, watch, defineProps } from "@nuxtjs/composition-api";
 
 import { getConfig } from "./config.js";
 import { addSeriesToChart } from "./chart.js";
+import dayjs from "dayjs";
 
 const props = defineProps({
   chart: Object,
@@ -43,7 +44,25 @@ const props = defineProps({
 
 const loading = ref(false);
 const chartref = ref(null);
-const config = getConfig();
+
+const tooltipFormatter = function () {
+  const humanReadableSensorNames = {
+    humi: "Humidity",
+    temp: "Temperature",
+    light: "Light",
+  };
+
+  const line = props.chart.agg[this.series.name];
+
+  const { mac } = line.sensor;
+
+  const sensorKind = humanReadableSensorNames[this.series.name.split("_")[1]];
+  const timestamp = dayjs().format("DD MMM YYYY HH:mm:ss");
+
+  return `<div>${sensorKind}(${mac}) : <b>${this.y}</b></div> <br/> <div>Timestamp: ${timestamp}</div>`;
+};
+
+const config = { ...getConfig(), tooltip: { formatter: tooltipFormatter } };
 
 onMounted(() => {
   watch(
@@ -66,6 +85,7 @@ onMounted(() => {
 
         const s = addSeriesToChart(chartref.value.chart, {
           name: key,
+          visible: props.chart.agg[key].visible,
           color: props.chart.agg[key].color,
         });
 

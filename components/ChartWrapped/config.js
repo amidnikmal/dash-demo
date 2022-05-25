@@ -1,32 +1,12 @@
 
+import dayjs from 'dayjs'
 
 const config = {
     chart: {
       backgroundColor: "rgba(0,0,0,0)",
       zoomType: "x",
     },
-  
-    rangeSelector: {
-      enabled: false,
-    },
-  
-    scrollbar: {
-      enabled: false,
-      liveRedraw: false,
-    },
-  
-    navigator: {
-      enabled: false,
-      adaptToUpdatedData: false,
-      xAxis: {
-        labels: {
-          format: "{value:%b %d, %H:%M}",
-          align: "center",
-          y: 12,
-        },
-      },
-    },
-  
+
     title: {
       text: null,
     },
@@ -50,21 +30,34 @@ const config = {
     },
   
     xAxis: {
+      // type: 'datetime',
+
       ordinal: false,
       tickWidth: 1,
       breaks: [],
-      min: null,
-      max: null,
-      events: {
-        afterSetExtremes: null,
+  
+      labels: {
+        enabled: true,
+        formatter(e) {
+          return dayjs().format('MMM D, HH:mm')
+        },
+        align: 'center',
       },
     },
 
+    yAxis: [],
 
-
-
-    yAxis: [ ],
+    tooltip: {
+      formatter: null
+    },
   }
 
 
-export const getConfig = () => JSON.parse(JSON.stringify(config))
+export const getConfig = () => {
+  const copy = JSON.parse(JSON.stringify(config))
+
+  copy.xAxis.labels.formatter = config.xAxis.labels.formatter
+  // copy.tooltip.formatter = config.tooltip.formatter
+
+  return copy
+}
