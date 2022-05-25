@@ -38,8 +38,8 @@ const config = {
   
       labels: {
         enabled: true,
-        formatter(e) {
-          return dayjs().format('MMM D, HH:mm')
+        formatter() {          
+          return dayjs(this.value).format('MMM D, HH:mm')
         },
         align: 'center',
       },

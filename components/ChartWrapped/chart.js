@@ -30,7 +30,7 @@ export function addSeriesToChart(chart, config) {
       ...config,
       yAxis: chart.yAxis.length - 1,
       // yAxis: 0,
-      type: "spline",
+      // type: "spline",
     },
     true
   );

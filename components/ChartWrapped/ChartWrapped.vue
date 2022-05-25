@@ -23,7 +23,19 @@
       </div>
     </div>
 
-    <VueHighcharts class="data-chart" ref="chartref" :options="config" />
+    <VueHighcharts
+      v-show="chartType == 'line'"
+      class="data-chart"
+      ref="lineref"
+      :options="lineConfig"
+    />
+
+    <VueHighcharts
+      v-show="chartType == 'column'"
+      class="data-chart"
+      ref="columnref"
+      :options="columnChartConfig"
+    />
   </v-card>
 </template>
 
@@ -31,9 +43,17 @@
 <script setup>
 import Settings from "./Settings.vue";
 
-import { ref, onMounted, watch, defineProps } from "@nuxtjs/composition-api";
+import {
+  ref,
+  onMounted,
+  watch,
+  defineProps,
+  computed,
+} from "@nuxtjs/composition-api";
 
 import { getConfig } from "./config.js";
+import { columnConfigDefault } from "./columnConfigDefault";
+
 import { addSeriesToChart } from "./chart.js";
 import dayjs from "dayjs";
 
@@ -42,8 +62,12 @@ const props = defineProps({
   index: Number,
 });
 
-const loading = ref(false);
-const chartref = ref(null);
+// const loading = ref(false);
+
+const lineref = ref(null);
+const columnref = ref(null);
+
+const chartType = computed(() => props.chart.type);
 
 const tooltipFormatter = function () {
   const humanReadableSensorNames = {
@@ -57,39 +81,63 @@ const tooltipFormatter = function () {
   const { mac } = line.sensor;
 
   const sensorKind = humanReadableSensorNames[this.series.name.split("_")[1]];
-  const timestamp = dayjs().format("DD MMM YYYY HH:mm:ss");
+  const timestamp = dayjs(this.x).format("DD MMM YYYY HH:mm:ss");
 
   return `<div>${sensorKind}(${mac}) : <b>${this.y}</b></div> <br/> <div>Timestamp: ${timestamp}</div>`;
 };
 
-const config = { ...getConfig(), tooltip: { formatter: tooltipFormatter } };
+const lineConfig = { ...getConfig(), tooltip: { formatter: tooltipFormatter } };
+const columnChartConfig = columnConfigDefault;
+
+const handleLineChartChange = () => {
+  for (const key in props.chart.agg) {
+    const foundseries = lineref.value.chart.series.find((s) => s.name == key);
+
+    if (foundseries) {
+      foundseries.update({
+        name: key ?? props.chart.agg[key].name,
+        color: props.chart.agg[key].color,
+        visible: props.chart.agg[key].visible,
+      });
+
+      continue;
+    }
+
+    const s = addSeriesToChart(lineref.value.chart, {
+      name: key,
+      visible: props.chart.agg[key].visible,
+      color: props.chart.agg[key].color,
+      type: "spline",
+    });
+
+    s.setData(props.chart.agg[key].data);
+  }
+};
+
+const handleColumnChartChange = () => {
+  console.log("HANDLE? ?? ? ? COL:UMN", props.chart.columnagg);
+
+  for (let s of props.chart.columnagg.series) {
+    const chartSeries = addSeriesToChart(columnref.value.chart, {
+      name: s.name,
+      // visible: props.chart.agg[key].visible,
+      // color: props.chart.agg[key].color,
+    });
+
+    chartSeries.setData(s.data);
+  }
+};
 
 onMounted(() => {
   watch(
-    props.chart.agg,
+    props.chart,
     () => {
-      for (const key in props.chart.agg) {
-        const foundseries = chartref.value.chart.series.find(
-          (s) => s.name == key
-        );
+      if (props.chart.type === "line") {
+        handleLineChartChange();
+      }
 
-        if (foundseries) {
-          foundseries.update({
-            name: key ?? props.chart.agg[key].name,
-            color: props.chart.agg[key].color,
-            visible: props.chart.agg[key].visible,
-          });
-
-          continue;
-        }
-
-        const s = addSeriesToChart(chartref.value.chart, {
-          name: key,
-          visible: props.chart.agg[key].visible,
-          color: props.chart.agg[key].color,
-        });
-
-        s.setData(props.chart.agg[key].data);
+      if (props.chart.type === "column") {
+        handleColumnChartChange();
       }
     },
     { immediate: true }

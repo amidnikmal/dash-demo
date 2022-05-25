@@ -1,5 +1,78 @@
 import { DataApi } from '@/api/data'
 import Vue from 'vue'
+import dayjs from 'dayjs'
+// const isBetween = require('dayjs/plugin/isBetween')
+import isBetween from 'dayjs/plugin/isBetween'
+dayjs.extend(isBetween)
+
+
+
+const prepareColumnChartSeries = (ctx) => {
+  const { sensorTypes, sensors, data } = ctx.rootState  
+
+  const start = dayjs(data.list[0].timestamp)
+  const end = dayjs(data.list[data.list.length -1].timestamp)
+
+  const diff = end.diff(start) / 10
+
+  let step = start
+  let columns = []
+  let categories = []
+
+  for (let i=0; i<10; i++) {
+    const next = step.add(diff, 'ms')
+    const column = { start: step, end: next, points : []}
+    for (let dataItem of data.list) {
+      const result = dayjs(dataItem.timestamp).isBetween(step, next)
+      if (result) {
+        column.points.push(dataItem)
+      }
+    }
+    categories.push(next.format('YYYY-MM-DD HH:mm'))
+    columns.push(column)
+    step = next
+  }
+
+  const series = []
+
+  for (let seriesTypeItem of sensorTypes.list) {    
+    for (const sensorKind of seriesTypeItem.sensors) {
+      for (const sensor of sensors.list) {
+        const key = `${sensor.id}_${sensorKind}`
+        const foundseries = series.find(s => s.name === key)
+        if (foundseries) {
+          continue
+        }
+        series.push({
+          name: `${sensor.id}_${sensorKind}`,
+          data: []
+        })
+      }
+    }
+  }
+
+  for (let col of columns) {
+    let max = {}
+    for (let point of col.points) {
+      for (const key in point.payload) {
+        const uniq_key = `${point.sensor_id}_${key}`
+        if (!max[uniq_key]) {
+          max[uniq_key] = point.payload[key]
+          continue
+        } 
+        if (max[uniq_key] < point.payload[key]) {
+          max[uniq_key] = point.payload[key]
+        }
+      }
+    }
+
+    for (let s of series) {
+      s.data.push(max[s.name])
+    }
+  }
+
+  return JSON.parse(JSON.stringify({categories, series }))
+}
 
 
 const prepareSeries = (ctx) => {
@@ -11,7 +84,7 @@ const prepareSeries = (ctx) => {
     const sensorType = sensorTypes.list.find(t => t.id == sensor.type)
 
     for (const sensorKind of sensorType.sensors) {
-      const point =  { x: +new Date(dataItem.timestamp), y: dataItem.payload[sensorKind] }
+      const point =  { x: dayjs(dataItem.timestamp).valueOf(), y: dataItem.payload[sensorKind] }
 
       if (!agg[`${sensor.id}_${sensorKind}`]) {
         const color = '#'+Math.floor(Math.random()*16777215).toString(16);
@@ -40,8 +113,12 @@ const prepareSeries = (ctx) => {
 
 const initChart = (ctx) => {
   const agg = prepareSeries(ctx)
+  const columnagg = prepareColumnChartSeries(ctx)
+
   return {
+    type: 'line',
     agg,
+    columnagg,
     activeSensors: Object.entries(agg).map(([key, value])=> key)
   }
 }
@@ -102,6 +179,10 @@ export const mutations = {
     }
 
     localStorage.setItem('charts', JSON.stringify(state.charts))
+  },
+
+  setChartType(state, { ctx, params: { index, type } }) {
+    state.charts[index].type = type
   }
 }
 
@@ -122,5 +203,9 @@ export const actions = {
 
   changeChartParams(ctx, params) {
     ctx.commit('changeChartParams', { ctx, params })
+  },
+
+  setChartType(ctx, params) {
+    ctx.commit('setChartType', { ctx, params })
   }
 }

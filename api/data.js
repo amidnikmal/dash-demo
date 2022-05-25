@@ -5,7 +5,7 @@ import { fakeList as fakeSensorsList } from './sensors'
 import { SENSOR_TYPES } from './sensorTypes'
 import { data } from './sample_data'
 
-const FAKE_DATA_ITEMS_COUNT = 100
+const FAKE_DATA_ITEMS_COUNT = 20
 const FAKE_DATA_DATES_RANGE = { from: new Date('1/01/2022'), to: new Date() }
 
 

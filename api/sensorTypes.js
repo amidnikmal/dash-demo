@@ -1,8 +1,8 @@
 
 export const SENSOR_TYPES = [
-  // { id: 0, name: 'Temp' , sensors: [ 'temp' ] },
-  { id: 0, name: 'Composite', sensors: [ 'humi', 'temp' ]},
-  { id: 1, name: 'Geo', sensors: [/*'loc',*/ 'humi', 'temp', 'light']}
+  { id: 0, name: 'Temp' , sensors: [ 'temp' ] },
+  { id: 1, name: 'Composite', sensors: [ 'humi', 'temp' ]},
+  { id: 2, name: 'Geo', sensors: [/*'loc',*/ 'humi', 'temp', 'light']}
 ]
 
 const FAKE_DELAY_MS = 500
