@@ -48,6 +48,7 @@ const config = {
     yAxis: [],
 
     tooltip: {
+      split: true,
       formatter: null
     },
   }

@@ -1,13 +1,12 @@
 import { DataApi } from '@/api/data'
 import Vue from 'vue'
 import dayjs from 'dayjs'
-// const isBetween = require('dayjs/plugin/isBetween')
 import isBetween from 'dayjs/plugin/isBetween'
 dayjs.extend(isBetween)
 
 
 
-const prepareColumnChartSeries = (ctx) => {
+const prepareColumnChartSeries = (ctx, agg) => {
   const { sensorTypes, sensors, data } = ctx.rootState  
 
   const start = dayjs(data.list[0].timestamp)
@@ -38,13 +37,25 @@ const prepareColumnChartSeries = (ctx) => {
   for (let seriesTypeItem of sensorTypes.list) {    
     for (const sensorKind of seriesTypeItem.sensors) {
       for (const sensor of sensors.list) {
+
+        if (sensor.type !== seriesTypeItem.id) {
+          continue;
+        }
+
         const key = `${sensor.id}_${sensorKind}`
         const foundseries = series.find(s => s.name === key)
+
         if (foundseries) {
           continue
         }
+
+        const k = `${sensor.id}_${sensorKind}`
+
         series.push({
-          name: `${sensor.id}_${sensorKind}`,
+          sensor,
+          visible: true,
+          color: agg[k] ? agg[k].color : null,
+          name: k,
           data: []
         })
       }
@@ -113,7 +124,7 @@ const prepareSeries = (ctx) => {
 
 const initChart = (ctx) => {
   const agg = prepareSeries(ctx)
-  const columnagg = prepareColumnChartSeries(ctx)
+  const columnagg = prepareColumnChartSeries(ctx, agg)
 
   return {
     type: 'line',
@@ -174,8 +185,13 @@ export const mutations = {
 
   changeChartParams(state, { ctx, params }) {
     const { index, key: sensorKey, ...actualParams } = params
+
     for (const key in actualParams) {
       Vue.set(state.charts[index].agg[sensorKey], key, actualParams[key])
+
+      const foundColumnSeries = state.charts[index].columnagg.series.find(s => s.name === sensorKey)
+      
+      Vue.set(foundColumnSeries, key, actualParams[key])
     }
 
     localStorage.setItem('charts', JSON.stringify(state.charts))
@@ -183,6 +199,7 @@ export const mutations = {
 
   setChartType(state, { ctx, params: { index, type } }) {
     state.charts[index].type = type
+    localStorage.setItem('charts', JSON.stringify(state.charts))
   }
 }
 

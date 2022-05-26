@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 
 // const pieConfigDefault = {
 //     chart: {
@@ -56,11 +57,18 @@ export const columnConfigDefault = {
           enabled: false
         }
       },
-  
     },
+
     xAxis: {
-  
-      // crosshair: true
+      type: 'datetime',
+      labels: {
+        enabled: true,
+        formatter() {          
+          return dayjs(this.value).format('MMM D, HH:mm')
+        },
+        // align: 'center',
+      },
+      crosshair: true
     },
   
     yAxis: {
@@ -68,5 +76,10 @@ export const columnConfigDefault = {
         enabled: false
       }
     },
+
+    tooltip: {
+      formatter: null
+    },
+
     series: []
   };

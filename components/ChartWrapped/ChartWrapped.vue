@@ -62,7 +62,7 @@ const props = defineProps({
   index: Number,
 });
 
-// const loading = ref(false);
+const loading = ref(false);
 
 const lineref = ref(null);
 const columnref = ref(null);
@@ -87,6 +87,30 @@ const tooltipFormatter = function () {
 };
 
 const lineConfig = { ...getConfig(), tooltip: { formatter: tooltipFormatter } };
+
+columnConfigDefault.tooltip.formatter = function () {
+  const indx = this.series.xAxis.categories.findIndex((c) => c === this.x);
+
+  const nextCategory = this.series.xAxis.categories[indx + 1];
+
+  const foundSeries = props.chart.columnagg.series.find(
+    (ss) => ss.name == this.series.name
+  );
+
+  const { mac } = foundSeries.sensor;
+
+  const sensorKindKey = this.series.name.split("_")[1];
+
+  const timestamp = dayjs(this.x).format("DD MMM YYYY HH:mm:ss");
+  const to = dayjs(nextCategory).format("DD MMM YYYY HH:mm:ss");
+
+  return `
+    <div>Max Value of ${sensorKindKey} (${mac}) is <b>${this.y}</b></div> 
+    <br/>
+    <div>Interval from <b>${timestamp}</b> to <b>${to}</b></div>
+  `;
+};
+
 const columnChartConfig = columnConfigDefault;
 
 const handleLineChartChange = () => {
@@ -115,13 +139,29 @@ const handleLineChartChange = () => {
 };
 
 const handleColumnChartChange = () => {
-  console.log("HANDLE? ?? ? ? COL:UMN", props.chart.columnagg);
+  columnref.value.chart.xAxis[0].setCategories(
+    props.chart.columnagg.categories
+  );
 
   for (let s of props.chart.columnagg.series) {
+    const foundseries = columnref.value.chart.series.find(
+      (ss) => ss.name == s.name
+    );
+
+    if (foundseries) {
+      foundseries.update({
+        name: s.name,
+        color: s.color,
+        visible: s.visible,
+      });
+
+      continue;
+    }
+
     const chartSeries = addSeriesToChart(columnref.value.chart, {
       name: s.name,
-      // visible: props.chart.agg[key].visible,
-      // color: props.chart.agg[key].color,
+      visible: s.visible,
+      color: s.color,
     });
 
     chartSeries.setData(s.data);
