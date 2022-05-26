@@ -3,7 +3,10 @@
     <DashboardControls />
 
     <div class="dashboard-container-content">
-      <v-card class="stats my-3"> stats </v-card>
+      <v-card class="stats my-3">
+        <SensorsStat />
+        <DonutChart />
+      </v-card>
 
       <div class="dynamic-charts">
         <ChartWrapped
@@ -22,6 +25,9 @@
 <script>
 // import { watch } from "@nuxtjs/composition-api";
 
+import SensorsStat from "@/components/SensorsStat";
+
+import DonutChart from "@/components/DonutChart";
 import ChartWrapped from "@/components/ChartWrapped";
 import DashboardControls from "@/components/DashboardControls";
 import AddNewChart from "@/components/AddNewChart";
@@ -29,7 +35,13 @@ import AddNewChart from "@/components/AddNewChart";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
-  components: { ChartWrapped, DashboardControls, AddNewChart },
+  components: {
+    ChartWrapped,
+    DashboardControls,
+    AddNewChart,
+    DonutChart,
+    SensorsStat,
+  },
 
   async mounted() {
     await this.getSensorTypesList();

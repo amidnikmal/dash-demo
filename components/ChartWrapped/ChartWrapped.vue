@@ -97,6 +97,10 @@ columnConfigDefault.tooltip.formatter = function () {
     (ss) => ss.name == this.series.name
   );
 
+  if (!foundSeries) {
+    return;
+  }
+
   const { mac } = foundSeries.sensor;
 
   const sensorKindKey = this.series.name.split("_")[1];
