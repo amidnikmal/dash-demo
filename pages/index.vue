@@ -3,10 +3,15 @@
     <DashboardControls />
 
     <div class="dashboard-container-content">
-      <v-card class="stats my-3">
-        <SensorsStat />
-        <DonutChart />
-      </v-card>
+      <v-container class="stats" fluid>
+        <v-card>
+          <SensorsStat />
+        </v-card>
+
+        <v-card class="mt-3">
+          <DonutChart />
+        </v-card>
+      </v-container>
 
       <div class="dynamic-charts">
         <ChartWrapped
