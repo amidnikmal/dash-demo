@@ -1,19 +1,13 @@
 <template>
-  <!-- <div>
-    <div>fake data list</div>
-    <v-btn @click="onClickGenerateNewData">Generate new Data</v-btn>
-    <div>{{ successString }}</div>
-  </div> -->
-
-  <!-- v-model="valid" -->
   <v-container>
     <v-form>
       <v-container>
         <v-row>
           <v-col>
             <v-text-field
-              v-model="sensorsCount"
+              :value="sensorsCount"
               label="Sensors Count"
+              @input="onChange('sensorsCount', $event)"
             ></v-text-field>
           </v-col>
           <v-col>
@@ -115,5 +109,16 @@ const onMenuInput = () => {
       value: { from, to },
     });
   }
+};
+
+const onChange = (key, value) => {
+  if (typeof value === "string") {
+    value = Number(value);
+  }
+
+  store.dispatch("fakedata/setParams", {
+    key,
+    value,
+  });
 };
 </script>

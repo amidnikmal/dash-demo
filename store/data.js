@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
 dayjs.extend(isBetween)
 
-
+const DEFAULT_VISIBLE_SERIES = 6
 
 const prepareColumnChartSeries = (ctx, agg) => {
   const { sensorTypes, sensors, data } = ctx.rootState  
@@ -33,14 +33,17 @@ const prepareColumnChartSeries = (ctx, agg) => {
   }
 
   const series = []
-
-  for (let seriesTypeItem of sensorTypes.list) {    
+  let index = -1
+  for (let seriesTypeItem of sensorTypes.list) {
+    
     for (const sensorKind of seriesTypeItem.sensors) {
       for (const sensor of sensors.list) {
 
         if (sensor.type !== seriesTypeItem.id) {
           continue;
         }
+
+        index++
 
         const key = `${sensor.id}_${sensorKind}`
         const foundseries = series.find(s => s.name === key)
@@ -53,7 +56,7 @@ const prepareColumnChartSeries = (ctx, agg) => {
 
         series.push({
           sensor,
-          visible: true,
+          visible: index < DEFAULT_VISIBLE_SERIES,
           color: agg[k] ? agg[k].color : null,
           name: k,
           data: []
@@ -90,12 +93,14 @@ const prepareSeries = (ctx) => {
   const { sensorTypes, sensors, data } = ctx.rootState
 
   let agg = {}
+  let index = -1
+
   for (const dataItem of data.list) {
     const sensor = sensors.list.find(s => s.id == dataItem.sensor_id)
-
     const sensorType = sensorTypes.list.find(t => t.id == sensor.type)
 
     for (const sensorKind of sensorType.sensors) {
+      index++
       const point =  { x: dayjs(dataItem.timestamp).valueOf(), y: dataItem.payload[sensorKind] }
 
       if (!agg[`${sensor.id}_${sensorKind}`]) {
@@ -103,7 +108,7 @@ const prepareSeries = (ctx) => {
 
         Vue.set(agg, `${sensor.id}_${sensorKind}`, {
           color,
-          visible: true,
+          visible: index < DEFAULT_VISIBLE_SERIES,
           sensor,
           sensorType,
           data: [ point ]
@@ -138,7 +143,11 @@ const initChart = (ctx) => {
 
 
 export const state = () => ({
-  filters: {},
+  filters: {
+    sensorsFilter: [],
+    sensorTypesFilter: [],
+    dateRangeFilter: []
+  },
   list: [],
   agg: {},
   charts: []
@@ -160,19 +169,21 @@ export const getters = {
 }
 
 export const mutations = {
+
+  setFilters(state, filters) {
+    state.filters = filters
+  },
+
   setList(state, list) {
     state.list = list
   },
 
   prepareCharts(state, { ctx }) {
     let charts = JSON.parse(localStorage.getItem('charts'))
-    console.log("CHARTS", charts)
     if (!charts || charts.length == 0) {
       state.charts = [ initChart(ctx) ]
       return
     }
-
-
 
     state.charts = charts
   },
@@ -210,8 +221,6 @@ export const mutations = {
 export const actions = {
   async getList(ctx) {
     const list = await DataApi.getList(ctx.rootState)
-
-    console.log("LIST", list)
     ctx.commit('setList', list)
     ctx.commit('prepareCharts', { ctx })
   },

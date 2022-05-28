@@ -22,7 +22,7 @@
 
 <script setup>
 import dayjs from "dayjs";
-import { ref, useStore, computed, reactive } from "@nuxtjs/composition-api";
+import { ref, useStore, computed } from "@nuxtjs/composition-api";
 
 const SENSOR_TYPES_TAB = 0;
 const SENSORS_TAB = 1;
@@ -59,7 +59,8 @@ const sensorsTable = computed(() => ({
     { text: "Created At", value: "formattedTimestamp" },
   ],
   items: sensors.value.map((s) => {
-    const foundSensorType = sensorTypes.value.find((st) => st.id == s.id);
+    const foundSensorType = sensorTypes.value.find((st) => st.id == s.type);
+
     const sensorType = foundSensorType.name;
 
     const formattedTimestamp = dayjs(s.timestamp).format("YYYY-MM-DD HH:mm");
