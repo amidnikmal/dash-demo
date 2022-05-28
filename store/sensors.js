@@ -17,7 +17,7 @@ export const mutations = {
 
 export const actions = {
   async getList(ctx) {
-    const list = await SensorsApi.getList()
+    const list = await SensorsApi.getList(ctx.rootState)
     ctx.commit('setList', list)
   }
 }

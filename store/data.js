@@ -92,6 +92,7 @@ const prepareSeries = (ctx) => {
   let agg = {}
   for (const dataItem of data.list) {
     const sensor = sensors.list.find(s => s.id == dataItem.sensor_id)
+
     const sensorType = sensorTypes.list.find(t => t.id == sensor.type)
 
     for (const sensorKind of sensorType.sensors) {
@@ -107,6 +108,7 @@ const prepareSeries = (ctx) => {
           sensorType,
           data: [ point ]
         })
+
         continue
       }
 
@@ -164,11 +166,13 @@ export const mutations = {
 
   prepareCharts(state, { ctx }) {
     let charts = JSON.parse(localStorage.getItem('charts'))
-
+    console.log("CHARTS", charts)
     if (!charts || charts.length == 0) {
       state.charts = [ initChart(ctx) ]
       return
     }
+
+
 
     state.charts = charts
   },
@@ -205,7 +209,9 @@ export const mutations = {
 
 export const actions = {
   async getList(ctx) {
-    const list = await DataApi.getList()
+    const list = await DataApi.getList(ctx.rootState)
+
+    console.log("LIST", list)
     ctx.commit('setList', list)
     ctx.commit('prepareCharts', { ctx })
   },

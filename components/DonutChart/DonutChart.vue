@@ -45,6 +45,10 @@ watch(
           (st) => st.id === Number(key)
         );
 
+        if (!foundSensorType) {
+          continue;
+        }
+
         tempconfig.series[0].data.push({
           name: foundSensorType.name,
           y: agg[key].length,

@@ -1,59 +1,57 @@
 
-import { randBetweenDate } from '@ngneat/falso'
-import { getRandomNumberBetween } from './helpers'
-import { fakeList as fakeSensorsList } from './sensors'
-import { SENSOR_TYPES } from './sensorTypes'
-import { data } from './sample_data'
+// import { randBetweenDate } from '@ngneat/falso'
+// import { getRandomNumberBetween } from './helpers'
+// import { fakeList as fakeSensorsList } from './sensors'
+// import { SENSOR_TYPES } from './sensorTypes'
+// import { data } from './sample_data'
 
-const FAKE_DATA_ITEMS_COUNT = 20
-const FAKE_DATA_DATES_RANGE = { from: new Date('1/01/2022'), to: new Date() }
-
-
-const generateFakeData = () => {
-  const output =
-    new Array(FAKE_DATA_ITEMS_COUNT)
-    .fill()
-    .map(() => randBetweenDate(FAKE_DATA_DATES_RANGE))
-    .sort((a,b) => a - b)
-    .map((timestamp, index) => ({ id: index, timestamp }))
+// const FAKE_DATA_ITEMS_COUNT = 20
+// const FAKE_DATA_DATES_RANGE = { from: new Date('1/01/2022'), to: new Date() }
 
 
-  for (let i=0; i<FAKE_DATA_ITEMS_COUNT; i++) {
-    const randomSensorIndx = getRandomNumberBetween(0, fakeSensorsList.length-1)
-    const randSensor = fakeSensorsList[randomSensorIndx] 
+// const generateFakeData = () => {
+//   const output =
+//     new Array(FAKE_DATA_ITEMS_COUNT)
+//     .fill()
+//     .map(() => randBetweenDate(FAKE_DATA_DATES_RANGE))
+//     .sort((a,b) => a - b)
+//     .map((timestamp, index) => ({ id: index, timestamp }))
 
-    const sensorType = SENSOR_TYPES.find((item) => item.id === randSensor.type)
 
-    if (!sensorType) {
-      continue
-    }
+//   for (let i=0; i<FAKE_DATA_ITEMS_COUNT; i++) {
+//     const randomSensorIndx = getRandomNumberBetween(0, fakeSensorsList.length-1)
+//     const randSensor = fakeSensorsList[randomSensorIndx] 
 
-    const payload = sensorType.sensors.reduce((acc, sensorKind) => {
-      acc[sensorKind] = data[i][sensorKind]
-      return acc
-    }, {})
+//     const sensorType = SENSOR_TYPES.find((item) => item.id === randSensor.type)
 
-    output[i] = {
-      ...output[i],
-      sensor_type: randSensor.type,
-      sensor_id: randSensor.id,
-      payload,
-    }
-  }
+//     if (!sensorType) {
+//       continue
+//     }
 
-  // output.sort((a,b) => {
-  //   return (+new Date(a.timestamp)) - (+new Date(b.timestamp))
-  // })
+//     const payload = sensorType.sensors.reduce((acc, sensorKind) => {
+//       acc[sensorKind] = data[i][sensorKind]
+//       return acc
+//     }, {})
 
-  return output
-}
+//     output[i] = {
+//       ...output[i],
+//       sensor_type: randSensor.type,
+//       sensor_id: randSensor.id,
+//       payload,
+//     }
+//   }
 
-export const fakeDataList = generateFakeData()
+
+//   return output
+// }
+
+// // export const fakeDataList = generateFakeData()
+// export const fakeDataList = []
 
 export class DataApi {
-  static getList() {
+  static getList(store) {
     return new Promise((resolve) => {
-      resolve(fakeDataList)
+      resolve(store.fakedata.data)
     })
   }
 }

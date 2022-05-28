@@ -29,10 +29,6 @@
     <v-main>
       <Nuxt keep-alive />
     </v-main>
-
-    <!-- <v-footer :absolute="!fixed" app>
-      <span>&copy; {{ new Date().getFullYear() }}</span>
-    </v-footer> -->
   </v-app>
 </template>
 
@@ -54,6 +50,11 @@ export default {
           icon: "mdi-chart-bubble",
           title: "Data",
           to: "/data",
+        },
+        {
+          icon: "mdi-chart-bubble",
+          title: "Fake data settings",
+          to: "/fakedata",
         },
       ],
       miniVariant: false,

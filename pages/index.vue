@@ -28,8 +28,6 @@
 </template>
 
 <script>
-// import { watch } from "@nuxtjs/composition-api";
-
 import SensorsStat from "@/components/SensorsStat";
 
 import DonutChart from "@/components/DonutChart";
@@ -49,19 +47,10 @@ export default {
   },
 
   async mounted() {
+    this.genFakeData();
     await this.getSensorTypesList();
     await this.getSensorsList();
     await this.getDataList();
-
-    console.log(this.sensors);
-    console.log(this.sensorTypes);
-    console.log(this.data);
-
-    // const handler = () => {
-    //   const { sm, md, lg } = this.$vuetify.breakpoint;
-    // };
-    // // Throttle !
-    // watch(this.$vuetify.breakpoint, handler, { immediate: true });
   },
 
   computed: {
@@ -75,6 +64,7 @@ export default {
 
   methods: {
     ...mapActions({
+      genFakeData: "fakedata/genFakeData",
       getSensorTypesList: "sensorTypes/getList",
       getSensorsList: "sensors/getList",
       getDataList: "data/getList",
