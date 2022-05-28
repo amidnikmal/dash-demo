@@ -42,16 +42,16 @@ const sensorTypes = computed(() => store.getters["fakedata/sensorTypes"]);
 const sensors = computed(() => store.getters["fakedata/sensors"]);
 const data = computed(() => store.getters["fakedata/data"]);
 
-const sensorTypesTable = reactive({
+const sensorTypesTable = computed(() => ({
   headers: [
     { text: "ID", value: "id" },
     { text: "Sensor type name", value: "name" },
     { text: "Sensor parameters", value: "sensors" },
   ],
   items: sensorTypes.value,
-});
+}));
 
-const sensorsTable = reactive({
+const sensorsTable = computed(() => ({
   headers: [
     { text: "ID", value: "id" },
     { text: "Sensor MAC", value: "mac" },
@@ -70,9 +70,9 @@ const sensorsTable = reactive({
       formattedTimestamp,
     };
   }),
-});
+}));
 
-const dataTable = reactive({
+const dataTable = computed(() => ({
   headers: [
     { text: "ID", value: "id" },
     { text: "Sensor MAC", value: "mac" },
@@ -99,5 +99,5 @@ const dataTable = reactive({
       sensorType: foundSensorType.name,
     };
   }),
-});
+}));
 </script>
