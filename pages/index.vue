@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="dashboard-container">
+  <v-container class="dashboard-container">
     <DashboardControls />
 
     <div class="dashboard-container-content">
@@ -77,8 +77,6 @@ export default {
 <style scoped lang="scss">
 .dashboard-container-content {
   display: flex;
-  // padding: 24px;
-
   .stats {
     flex: 1;
   }
@@ -87,12 +85,4 @@ export default {
     flex-basis: 60%;
   }
 }
-
-// .data-chart {
-//   flex-basis: 60%;
-// }
-
-// .chart {
-//   flex: 1;
-// }
 </style>

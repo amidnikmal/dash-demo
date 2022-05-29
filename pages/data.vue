@@ -41,7 +41,7 @@ const dataTable = computed(() => ({
       (st) => st.id == dataItem.sensor_type
     );
 
-    const { mac } = sensors.value.find((s) => s.id == dataItem.sensor_type);
+    const { mac } = sensors.value.find((s) => s.id == dataItem.sensor_id);
 
     const formattedTimestamp = dayjs(dataItem.timestamp).format(
       "YYYY-MM-DD HH:mm"

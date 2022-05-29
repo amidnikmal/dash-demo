@@ -92,7 +92,13 @@ const onFilter = () => {
 };
 
 const onResetFilter = () => {
-  console.log("onResetFilter");
+  store.commit("data/setFilters", {
+    dateRangeFilter: null,
+    sensorTypesFilter: null,
+    sensorsFilter: null,
+  });
+
+  store.dispatch("data/getList");
 };
 </script>
 

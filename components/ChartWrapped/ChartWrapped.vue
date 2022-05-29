@@ -69,6 +69,11 @@ const columnref = ref(null);
 
 const chartType = computed(() => props.chart.type);
 
+// const chartProp = computed(() => props.chart);
+
+const lineChart = computed(() => props.chart.agg);
+const columnChart = computed(() => props.chart.columnagg);
+
 const tooltipFormatter = function () {
   const humanReadableSensorNames = {
     humi: "Humidity",
@@ -76,7 +81,9 @@ const tooltipFormatter = function () {
     light: "Light",
   };
 
-  const line = props.chart.agg[this.series.name];
+  const line = lineChart.value[this.series.name];
+
+  if (!line) return;
 
   const { mac } = line.sensor;
 
@@ -93,7 +100,7 @@ columnConfigDefault.tooltip.formatter = function () {
 
   const nextCategory = this.series.xAxis.categories[indx + 1];
 
-  const foundSeries = props.chart.columnagg.series.find(
+  const foundSeries = columnChart.series.find(
     (ss) => ss.name == this.series.name
   );
 
@@ -118,14 +125,15 @@ columnConfigDefault.tooltip.formatter = function () {
 const columnChartConfig = columnConfigDefault;
 
 const handleLineChartChange = () => {
-  for (const key in props.chart.agg) {
+  for (const key in lineChart.value) {
     const foundseries = lineref.value.chart.series.find((s) => s.name == key);
 
     if (foundseries) {
       foundseries.update({
-        name: key ?? props.chart.agg[key].name,
-        color: props.chart.agg[key].color,
-        visible: props.chart.agg[key].visible,
+        name: key ?? lineChart.value[key].name,
+        color: lineChart.value[key].color,
+        visible: lineChart.value[key].visible,
+        data: lineChart.value[key].data,
       });
 
       continue;
@@ -133,21 +141,19 @@ const handleLineChartChange = () => {
 
     const s = addSeriesToChart(lineref.value.chart, {
       name: key,
-      visible: props.chart.agg[key].visible,
-      color: props.chart.agg[key].color,
+      visible: lineChart.value[key].visible,
+      color: lineChart.value[key].color,
       type: "spline",
     });
 
-    s.setData(props.chart.agg[key].data);
+    s.setData(lineChart.value[key].data);
   }
 };
 
 const handleColumnChartChange = () => {
-  columnref.value.chart.xAxis[0].setCategories(
-    props.chart.columnagg.categories
-  );
+  columnref.value.chart.xAxis[0].setCategories(columnChart.value.categories);
 
-  for (let s of props.chart.columnagg.series) {
+  for (let s of columnChart.value.series) {
     const foundseries = columnref.value.chart.series.find(
       (ss) => ss.name == s.name
     );
@@ -174,12 +180,18 @@ const handleColumnChartChange = () => {
 
 onMounted(() => {
   watch(
-    props.chart,
+    lineChart,
     () => {
       if (props.chart.type === "line") {
         handleLineChartChange();
       }
+    },
+    { immediate: true }
+  );
 
+  watch(
+    columnChart,
+    () => {
       if (props.chart.type === "column") {
         handleColumnChartChange();
       }

@@ -142,6 +142,44 @@ const initChart = (ctx) => {
 }
 
 
+
+const recalcLineSeries = (ctx, chartIndex, chart) => {
+  console.log("recalcLineSeries", ctx, chartIndex)
+
+
+
+  const { sensorTypes, sensors, data } = ctx.rootState
+
+  for (const sensorKindKey in chart.agg) {
+    const sensorKind = sensorKindKey.split("_")[1]
+    const sensorId = parseInt(sensorKindKey.split("_")[0])
+
+    chart.agg[sensorKindKey].data = []
+
+    // Vue.set(chart.agg[sensorKindKey], data, [])
+
+    const filteredDataItems = data.list.filter((dataItem) => dataItem.sensor_id == sensorId)
+
+    if (filteredDataItems) {
+      for (let dataItem of filteredDataItems) {
+        const sensorParameter = dataItem.payload[sensorKind]
+        if (sensorParameter) {
+          const point =  { x: dayjs(dataItem.timestamp).valueOf(), y: dataItem.payload[sensorKind] }
+          chart.agg[sensorKindKey].data.push(point)
+        }
+      }
+    }
+  }
+
+
+
+  // return JSON.parse(JSON.stringify(chart))
+
+  // console.log("RECALCULATED", JSON.parse(JSON.stringify(chart.agg)))
+
+}
+
+
 export const state = () => ({
   filters: {
     sensorsFilter: [],
@@ -180,15 +218,32 @@ export const mutations = {
 
   prepareCharts(state, { ctx }) {
     let charts = JSON.parse(localStorage.getItem('charts'))
+
+    console.log("CHARTS FROM L S", charts)
+
     if (!charts || charts.length == 0) {
+
+      console.log("HERE ?? ")
       state.charts = [ initChart(ctx) ]
+
+      localStorage.setItem('charts', JSON.stringify(state.charts))
       return
     }
+
+    console.log("CHARTS BEFORE", JSON.parse(JSON.stringify(charts)))
+
+    for (let i=0; i<charts.length; i++) {
+      recalcLineSeries(ctx, i, charts[i])
+    }
+
+    console.log("after", JSON.parse(JSON.stringify(charts)))
+
 
     state.charts = charts
   },
 
   addChart(state, { ctx , props }) {
+    console.log('addCharts')
     state.charts.push(initChart(ctx))
     localStorage.setItem('charts', JSON.stringify(state.charts))
   },
@@ -221,6 +276,9 @@ export const mutations = {
 export const actions = {
   async getList(ctx) {
     const list = await DataApi.getList(ctx.rootState)
+
+    console.log("LIST", JSON.parse(JSON.stringify(list)))
+
     ctx.commit('setList', list)
     ctx.commit('prepareCharts', { ctx })
   },
