@@ -73,7 +73,7 @@ const dialog = ref(false);
 const tab = ref(null);
 
 const tabs = {
-  [FILTERS_TAB]: { name: "Filters", c: FiltersTab },
+  [FILTERS_TAB]: { name: "Chart settings", c: FiltersTab },
   [COLORS_TAB]: { name: "Colors", c: ColorSettingsTab },
 };
 

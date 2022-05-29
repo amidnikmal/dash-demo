@@ -6,8 +6,12 @@ dayjs.extend(isBetween)
 
 const DEFAULT_VISIBLE_SERIES = 6
 
-const prepareColumnChartSeries = (ctx, agg) => {
-  const { sensorTypes, sensors, data } = ctx.rootState  
+
+const getCategoriesAndColumnsFromList = (data) => {
+
+  if (!data.list[0]) {
+    return { categories: [], columns: [] }
+  }
 
   const start = dayjs(data.list[0].timestamp)
   const end = dayjs(data.list[data.list.length -1].timestamp)
@@ -31,6 +35,11 @@ const prepareColumnChartSeries = (ctx, agg) => {
     columns.push(column)
     step = next
   }
+
+  return { categories, columns }
+}
+
+const prepareEmptySeries = (sensorTypes, sensors, agg) => {
 
   const series = []
   let index = -1
@@ -56,7 +65,8 @@ const prepareColumnChartSeries = (ctx, agg) => {
 
         series.push({
           sensor,
-          visible: index < DEFAULT_VISIBLE_SERIES,
+          // visible: index < DEFAULT_VISIBLE_SERIES,
+          visible: agg[k] ? agg[k].visible : index < DEFAULT_VISIBLE_SERIES,
           color: agg[k] ? agg[k].color : null,
           name: k,
           data: []
@@ -65,6 +75,10 @@ const prepareColumnChartSeries = (ctx, agg) => {
     }
   }
 
+  return series
+}
+
+const fillColumnChartSeries = (columns, series) => {
   for (let col of columns) {
     let max = {}
     for (let point of col.points) {
@@ -84,8 +98,16 @@ const prepareColumnChartSeries = (ctx, agg) => {
       s.data.push(max[s.name])
     }
   }
+}
 
-  return JSON.parse(JSON.stringify({categories, series }))
+const prepareColumnChartSeries = (ctx, agg) => {
+  const { sensorTypes, sensors, data } = ctx.rootState  
+  const { columns , categories } = getCategoriesAndColumnsFromList(data)
+  const series = prepareEmptySeries(sensorTypes, sensors, agg)
+
+  fillColumnChartSeries(columns, series)
+
+  return JSON.parse(JSON.stringify({ categories, series }))
 }
 
 
@@ -129,17 +151,6 @@ const prepareSeries = (ctx) => {
 }
 
 
-const initChart = (ctx) => {
-  const agg = prepareSeries(ctx)
-  const columnagg = prepareColumnChartSeries(ctx, agg)
-
-  return {
-    type: 'line',
-    agg,
-    columnagg,
-    activeSensors: Object.entries(agg).map(([key, value])=> key)
-  }
-}
 
 
 
@@ -166,11 +177,24 @@ const recalcLineSeries = (ctx, chartIndex, chart) => {
     }
   }
 
-  let index = -1
-  for (const sensorKindKey in chart.agg) {
-    if (chart.agg[sensorKindKey].data.length > 0) {
-      chart.agg[sensorKindKey].visible = index < DEFAULT_VISIBLE_SERIES
-    }
+  // let index = -1
+  // for (const sensorKindKey in chart.agg) {
+  //   if (chart.agg[sensorKindKey].data.length > 0) {
+  //     chart.agg[sensorKindKey].visible = index < DEFAULT_VISIBLE_SERIES
+  //   }
+  // }
+}
+
+
+const initChart = (ctx) => {
+  const agg = prepareSeries(ctx)
+  const columnagg = prepareColumnChartSeries(ctx, agg)
+
+  return {
+    type: 'line',
+    agg,
+    columnagg,
+    activeSensors: Object.entries(agg).map(([key, value])=> key)
   }
 }
 
@@ -192,18 +216,16 @@ export const getters = {
 
   agg: state => state.agg,
 
-  visibleSensors: state => {
-    const entries = Object.entries(state.agg)
-    const filtered = entries.filter(([ _, { visible } ]) => visible)
-    return Object.fromEntries(filtered)
-  },
+  filters: state => state.filters,
 
   charts: state => state.charts
 }
 
 export const mutations = {
   setFilters(state, filters) {
-    state.filters = filters
+    for (const key in filters) {
+      state.filters[key] = filters[key]
+    }
   },
 
   setList(state, list) {
@@ -218,9 +240,10 @@ export const mutations = {
       localStorage.setItem('charts', JSON.stringify(state.charts))
       return
     }
-
     for (let i=0; i<charts.length; i++) {
       recalcLineSeries(ctx, i, charts[i])
+
+      charts[i].columnagg = prepareColumnChartSeries(ctx, charts[i].agg)
     }
 
     state.charts = charts
@@ -238,7 +261,7 @@ export const mutations = {
 
   changeChartParams(state, { ctx, params }) {
     const { index, key: sensorKey, ...actualParams } = params
-
+    
     for (const key in actualParams) {
       Vue.set(state.charts[index].agg[sensorKey], key, actualParams[key])
 

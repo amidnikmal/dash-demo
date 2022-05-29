@@ -7,9 +7,9 @@ export class DataApi {
   static getList(store) {
     let output = store.fakedata.data;
 
-    const dateRangeFilter = store.data.filters.dateRangeFilter.value
-    const sensorTypesFilter = store.data.filters.sensorTypesFilter.value
-    const sensorsFilter = store.data.filters.sensorsFilter.value
+    const dateRangeFilter = store.data.filters.dateRangeFilter
+    const sensorTypesFilter = store.data.filters.sensorTypesFilter
+    const sensorsFilter = store.data.filters.sensorsFilter
 
     if (dateRangeFilter) {
       const from = dateRangeFilter[0]

@@ -76,8 +76,7 @@ export const actions = {
       .map(() => randBetweenDate(range))
       .sort((a,b) => a - b)
       .map((timestamp, index) => ({ id: index, timestamp }))
-
-
+    
     for (let i=0; i<ctx.getters.params.dataCount; i++) {
       const randomSensorIndx = getRandomNumberBetween(0, fakeSensorsList.length-1)
       const randSensor = fakeSensorsList[randomSensorIndx] 
@@ -107,14 +106,14 @@ export const actions = {
 
   async genFakeData(ctx, params) {
     if (params && params.reset) {
+      // ctx.rootState.data.charts = []
+      // ctx.rootState.data.list = []
       localStorage.clear()
     }
 
     ctx.commit('setList', { key: 'sensorTypes', list: SENSOR_TYPES })
 
     const existingFakeData = JSON.parse(localStorage.getItem('fakeData'))
-
-    console.log("existingFakeData", existingFakeData)
 
     if (existingFakeData) {
       ctx.commit('setList', { key:'sensors', list: existingFakeData.sensors })

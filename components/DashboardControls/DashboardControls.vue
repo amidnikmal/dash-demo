@@ -13,7 +13,7 @@
           >
             <template v-slot:activator="{ on, attrs }">
               <v-text-field
-                v-model="dateRangeFilter"
+                :value="dateRangeFilter"
                 label="Dates range filter"
                 outlined
                 prepend-icon="mdi-calendar"
@@ -22,13 +22,18 @@
                 v-on="on"
               />
             </template>
-            <v-date-picker v-model="dateRangeFilter" range />
+            <v-date-picker
+              :value="dateRangeFilter"
+              @input="onFilterChanged('dateRangeFilter', $event)"
+              range
+            />
           </v-menu>
         </v-col>
 
         <v-col>
           <v-autocomplete
-            v-model="sensorTypesFilter"
+            :value="sensorTypesFilter"
+            @input="onFilterChanged('sensorTypesFilter', $event)"
             :items="preparedSensorTypesList"
             solo
             outlined
@@ -39,7 +44,8 @@
 
         <v-col>
           <v-autocomplete
-            v-model="sensorsFilter"
+            :value="sensorsFilter"
+            @input="onFilterChanged('sensorsFilter', $event)"
             :items="preparedSensorsList"
             solo
             outlined
@@ -77,17 +83,25 @@ const preparedSensorTypesList = computed(() =>
 
 const menu = ref(false);
 
-const dateRangeFilter = ref(null);
-const sensorTypesFilter = ref(null);
-const sensorsFilter = ref(null);
+const dateRangeFilter = computed(
+  () => store.getters["data/filters"].dateRangeFilter
+);
+
+const sensorTypesFilter = computed(
+  () => store.getters["data/filters"].sensorTypesFilter
+);
+
+const sensorsFilter = computed(
+  () => store.getters["data/filters"].sensorsFilter
+);
+
+const onFilterChanged = (key, value) => {
+  store.commit("data/setFilters", {
+    [key]: value,
+  });
+};
 
 const onFilter = () => {
-  store.commit("data/setFilters", {
-    dateRangeFilter,
-    sensorTypesFilter,
-    sensorsFilter,
-  });
-
   store.dispatch("data/getList");
 };
 

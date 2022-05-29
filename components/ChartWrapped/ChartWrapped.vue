@@ -46,6 +46,7 @@ import Settings from "./Settings.vue";
 import {
   ref,
   onMounted,
+  watchEffect,
   watch,
   defineProps,
   computed,
@@ -69,10 +70,10 @@ const columnref = ref(null);
 
 const chartType = computed(() => props.chart.type);
 
-// const chartProp = computed(() => props.chart);
-
 const lineChart = computed(() => props.chart.agg);
 const columnChart = computed(() => props.chart.columnagg);
+
+const computedChartProp = computed(() => props.chart);
 
 const tooltipFormatter = function () {
   const humanReadableSensorNames = {
@@ -100,7 +101,7 @@ columnConfigDefault.tooltip.formatter = function () {
 
   const nextCategory = this.series.xAxis.categories[indx + 1];
 
-  const foundSeries = columnChart.series.find(
+  const foundSeries = columnChart.value.series.find(
     (ss) => ss.name == this.series.name
   );
 
@@ -163,6 +164,7 @@ const handleColumnChartChange = () => {
         name: s.name,
         color: s.color,
         visible: s.visible,
+        data: s.data,
       });
 
       continue;
@@ -180,23 +182,16 @@ const handleColumnChartChange = () => {
 
 onMounted(() => {
   watch(
-    lineChart,
+    computedChartProp,
     () => {
-      if (props.chart.type === "line") {
+      if (chartType.value === "line") {
         handleLineChartChange();
       }
-    },
-    { immediate: true }
-  );
-
-  watch(
-    columnChart,
-    () => {
-      if (props.chart.type === "column") {
+      if (chartType.value === "column") {
         handleColumnChartChange();
       }
     },
-    { immediate: true }
+    { immediate: true, deep: true }
   );
 });
 

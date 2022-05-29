@@ -18,9 +18,6 @@ export const mutations = {
 export const actions = {
   async getList(ctx) {
     const list = await SensorTypesApi.getList()
-
-    console.log("SENSOR TYPES", list)
-    
     ctx.commit('setList', list)
   }
 }

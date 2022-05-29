@@ -12,8 +12,9 @@
           </v-col>
           <v-col>
             <v-text-field
-              v-model="dataCount"
+              :value="dataCount"
               label="Data frames count"
+              @input="onChange('dataCount', $event)"
             ></v-text-field>
           </v-col>
 
