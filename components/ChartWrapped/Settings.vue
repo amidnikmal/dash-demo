@@ -39,7 +39,6 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn color="error" text @click="onRemoveClick">Remove</v-btn>
-        <!-- <v-btn text @click="onClickCancel">Cancel</v-btn> -->
         <v-btn color="primary" text @click="onClickUpdate">Ok</v-btn>
       </v-card-actions>
     </v-card>
@@ -50,20 +49,15 @@
 import FiltersTab from "./FiltersTab.vue";
 import ColorSettingsTab from "./ColorSettingsTab.vue";
 
-import {
-  ref,
-  watch,
-  getCurrentInstance,
-  useStore,
-  defineProps,
-} from "@nuxtjs/composition-api";
+import { ref, useStore, defineProps, computed } from "@nuxtjs/composition-api";
 
 const props = defineProps({
   chart: Object,
   index: Number,
 });
 
-// const instance = getCurrentInstance();
+const chartIndex = computed(() => props.index);
+
 const store = useStore();
 
 const FILTERS_TAB = 0;
@@ -77,16 +71,12 @@ const tabs = {
   [COLORS_TAB]: { name: "Colors", c: ColorSettingsTab },
 };
 
-// const onClickCancel = () => {
-//   dialog.value = false;
-// };
-
 const onClickUpdate = () => {
   dialog.value = false;
 };
 
 const onRemoveClick = () => {
-  const chartIndex = props.index;
-  store.dispatch("data/removeChart", chartIndex);
+  console.log("chartIndex.value > > > >", chartIndex.value);
+  store.dispatch("data/removeChart", chartIndex.value);
 };
 </script>

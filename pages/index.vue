@@ -1,8 +1,8 @@
 <template>
-  <v-container class="dashboard-container">
+  <v-container class="d-flex flex-column">
     <DashboardControls />
 
-    <div class="dashboard-container-content">
+    <div class="d-flex">
       <v-container class="stats" fluid>
         <v-card>
           <SensorsStat />
@@ -13,16 +13,15 @@
         </v-card>
       </v-container>
 
-      <div class="dynamic-charts">
+      <v-container class="dynamic-charts">
         <ChartWrapped
-          class="my-3 ml-3"
+          class="mb-3"
           :key="index"
           v-for="(chart, index) in charts"
           v-bind="{ index, chart }"
         />
-
         <AddNewChart />
-      </div>
+      </v-container>
     </div>
   </v-container>
 </template>
@@ -46,7 +45,7 @@ export default {
     SensorsStat,
   },
 
-  async mounted() {
+  async activated() {
     this.genFakeData();
     await this.getSensorTypesList();
     await this.getSensorsList();
@@ -74,15 +73,12 @@ export default {
 </script>
 
 
-<style scoped lang="scss">
-.dashboard-container-content {
-  display: flex;
-  .stats {
-    flex: 1;
-  }
+<style scoped>
+.stats {
+  flex: 1;
+}
 
-  .dynamic-charts {
-    flex-basis: 60%;
-  }
+.dynamic-charts {
+  flex-basis: 60%;
 }
 </style>

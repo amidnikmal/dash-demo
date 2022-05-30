@@ -4,8 +4,7 @@ import dayjs from 'dayjs'
 import isBetween from 'dayjs/plugin/isBetween'
 dayjs.extend(isBetween)
 
-const DEFAULT_VISIBLE_SERIES = 6
-
+// const DEFAULT_VISIBLE_SERIES = 6
 
 const getCategoriesAndColumnsFromList = (data) => {
 
@@ -42,7 +41,7 @@ const getCategoriesAndColumnsFromList = (data) => {
 const prepareEmptySeries = (sensorTypes, sensors, agg) => {
 
   const series = []
-  let index = -1
+  // let index = -1
   for (let seriesTypeItem of sensorTypes.list) {
     
     for (const sensorKind of seriesTypeItem.sensors) {
@@ -52,7 +51,7 @@ const prepareEmptySeries = (sensorTypes, sensors, agg) => {
           continue;
         }
 
-        index++
+        // index++
 
         const key = `${sensor.id}_${sensorKind}`
         const foundseries = series.find(s => s.name === key)
@@ -66,7 +65,9 @@ const prepareEmptySeries = (sensorTypes, sensors, agg) => {
         series.push({
           sensor,
           // visible: index < DEFAULT_VISIBLE_SERIES,
-          visible: agg[k] ? agg[k].visible : index < DEFAULT_VISIBLE_SERIES,
+          // visible: agg[k] ? agg[k].visible : index < DEFAULT_VISIBLE_SERIES,
+
+          visible: agg[k] ? agg[k].visible : true,
           color: agg[k] ? agg[k].color : null,
           name: k,
           data: []
@@ -115,14 +116,14 @@ const prepareSeries = (ctx) => {
   const { sensorTypes, sensors, data } = ctx.rootState
 
   let agg = {}
-  let index = -1
+  // let index = -1
 
   for (const dataItem of data.list) {
     const sensor = sensors.list.find(s => s.id == dataItem.sensor_id)
     const sensorType = sensorTypes.list.find(t => t.id == sensor.type)
 
     for (const sensorKind of sensorType.sensors) {
-      index++
+      // index++
       const point =  { x: dayjs(dataItem.timestamp).valueOf(), y: dataItem.payload[sensorKind] }
 
       if (!agg[`${sensor.id}_${sensorKind}`]) {
@@ -130,7 +131,9 @@ const prepareSeries = (ctx) => {
 
         Vue.set(agg, `${sensor.id}_${sensorKind}`, {
           color,
-          visible: index < DEFAULT_VISIBLE_SERIES,
+          // visible: index < DEFAULT_VISIBLE_SERIES,
+
+          visible: true,
           sensor,
           sensorType,
           data: [ point ]
@@ -240,9 +243,9 @@ export const mutations = {
       localStorage.setItem('charts', JSON.stringify(state.charts))
       return
     }
+
     for (let i=0; i<charts.length; i++) {
       recalcLineSeries(ctx, i, charts[i])
-
       charts[i].columnagg = prepareColumnChartSeries(ctx, charts[i].agg)
     }
 

@@ -1,6 +1,6 @@
    
 <template>
-  <v-card class="my-3 ml-3">
+  <v-card>
     <div class="d-flex align-center justify-center pa-3">
       Add new chart
 
@@ -46,6 +46,8 @@ const store = useStore();
 const dialog = ref(false);
 
 const onAddNewChart = async () => {
+  store.dispatch("data/addChart");
+
   store.commit("data/setFilters", {
     sensorsFilter: [],
     sensorTypesFilter: [],
@@ -56,7 +58,5 @@ const onAddNewChart = async () => {
   await store.dispatch("sensorTypes/getList");
   await store.dispatch("sensors/getList");
   await store.dispatch("data/getList");
-
-  store.dispatch("data/addChart");
 };
 </script>
