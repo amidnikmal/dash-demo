@@ -1,0 +1,1 @@
+__NUXT_JSONP__("/fakedata", (function(a,b){return {data:[{}],fetch:{},mutations:[["fakedata\u002FsetList",{key:"sensorTypes",list:[{id:0,name:"Temp",sensors:[a]},{id:1,name:"Composite",sensors:[b,a]},{id:2,name:"Geo",sensors:[b,a,"light"]}]}]]}}("temp","humi")));

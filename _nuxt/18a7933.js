@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[18],{554:function(e,n,t){"use strict";t.r(n),t.d(n,"pieConfigDefault",(function(){return r}));var r={chart:{type:"pie",spacing:[0,0,0,0],backgroundColor:"rgba(0,0,0,0)"},credits:!1,title:{text:"Sensors by types",align:"center",verticalAlign:"middle",floating:!0},legend:{enabled:!1}}}}]);
