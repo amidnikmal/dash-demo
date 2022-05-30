@@ -4,7 +4,13 @@
 
 
 <script setup>
-import { useStore, watch, ref, computed } from "@nuxtjs/composition-api";
+import {
+  useStore,
+  watch,
+  ref,
+  computed,
+  onMounted,
+} from "@nuxtjs/composition-api";
 import { pieConfigDefault } from "./config";
 
 const store = useStore();
@@ -19,9 +25,13 @@ let tempconfig = JSON.parse(JSON.stringify(pieConfigDefault));
 
 let config = ref(null);
 
+const chartref = ref(null);
+
 watch(
   sensorsList,
   () => {
+    agg = {};
+
     tempconfig.series = [
       {
         name: "Amount of sensor of particular type",
@@ -56,6 +66,12 @@ watch(
       }
 
       config.value = tempconfig;
+
+      if (chartref.value) {
+        chartref.value.chart.series[0].update({
+          data: config.value.series[0].data,
+        });
+      }
     }
   },
   { immediate: true }
