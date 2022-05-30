@@ -30,7 +30,7 @@ const getCategoriesAndColumnsFromList = (data) => {
         column.points.push(dataItem)
       }
     }
-    categories.push(next.format('YYYY-MM-DD HH:mm'))
+    categories.push(step.format('YYYY-MM-DD HH:mm'))
     columns.push(column)
     step = next
   }
@@ -216,11 +216,8 @@ export const state = () => ({
 
 export const getters = {
   list: state => state.list,
-
   agg: state => state.agg,
-
   filters: state => state.filters,
-
   charts: state => state.charts
 }
 
